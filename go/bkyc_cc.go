@@ -69,7 +69,7 @@ func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNum
 	}
 
 
-	fmt.Println("userNumber", user);
+	// fmt.Println("userNumber", user);
 	userAsBytes, _ := json.Marshal(user)
 
 	return ctx.GetStub().PutState(userNumber, userAsBytes)
@@ -179,7 +179,7 @@ func (s *KYCreg) ChangeGender(ctx contractapi.TransactionContextInterface, userN
 	userAsBytes, _ := json.Marshal(user)
 	// print newgender
 
-	fmt.Println(newGender)
+	// fmt.Println(newGender)
 	return ctx.GetStub().PutState(userNumber, userAsBytes)
 }
 
