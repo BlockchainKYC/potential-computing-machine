@@ -66,11 +66,10 @@ func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNum
 		Address: 			address,
 		PhoneNumber:     	phoneNumber,
 		Email:  			email,
-		DocHash: 			docHash
+		DocHash: 			docHash,
 	}
 
 
-	// fmt.Println("userNumber", user);
 	userAsBytes, _ := json.Marshal(user)
 
 	return ctx.GetStub().PutState(userNumber, userAsBytes)
