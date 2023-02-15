@@ -19,14 +19,14 @@ type KYCreg struct {
 
 // User describes basic details of what makes up a User
 type User struct {
-	FirstName   	string `json:"firstName"`
-	LastName    	string `json:"lastName"`
-	Gender  		string `json:"gender"`
-	Email     		string `json:"email"`
-	PhoneNumber		string `json:"phoneNumber"`
-	Address 		string `json:"address"`
-	Key			 	string `json:"registrationId"`
-	DocHash 		string `json:"docHash"`
+	FirstName   	string		 `json:"firstName"`
+	LastName    	string		 `json:"lastName"`
+	Gender  		string		 `json:"gender"`
+	Email     		string		 `json:"email"`
+	PhoneNumber		string		 `json:"phoneNumber"`
+	Address 		string		 `json:"address"`
+	Key			 	string		 `json:"registrationId"`
+	DocHash 		[]string	 `json:"docHash"`
 }
 
 // QueryResult structure used for handling result of query
@@ -58,6 +58,7 @@ func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 
 // CreateUser adds a new user to the world state with given details
 func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNumber string, firstName string, lastName string, gender string, email string, phoneNumber string, address string) error {
+	docHash := []string{}
 	user := User{
 		FirstName: 			firstName,
 		LastName: 			lastName,
@@ -65,7 +66,7 @@ func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNum
 		Address: 			address,
 		PhoneNumber:     	phoneNumber,
 		Email:  			email,
-		
+		DocHash: 			docHash
 	}
 
 
@@ -161,6 +162,20 @@ func (s *KYCreg) ChangeUserLastName(ctx contractapi.TransactionContextInterface,
 	}
 
 	user.LastName = newLastName
+
+	userAsBytes, _ := json.Marshal(user)
+
+	return ctx.GetStub().PutState(userNumber, userAsBytes)
+}
+
+func (s *KYCreg) UpdateDocHash(ctx contractapi.TransactionContextInterface, userNumber string, newDocHash string) error {
+	user, err := s.QueryUser(ctx, userNumber)
+
+	if err != nil {
+		return err
+	}
+
+	user.DocHash = append(user.DocHash, newDocHash);
 
 	userAsBytes, _ := json.Marshal(user)
 
