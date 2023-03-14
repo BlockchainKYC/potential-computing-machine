@@ -19,14 +19,15 @@ type KYCreg struct {
 
 // User describes basic details of what makes up a User
 type User struct {
-	FirstName   	string		 `json:"firstName"`
-	LastName    	string		 `json:"lastName"`
-	Gender  		string		 `json:"gender"`
-	Email     		string		 `json:"email"`
-	PhoneNumber		string		 `json:"phoneNumber"`
-	Address 		string		 `json:"address"`
-	Key			 	string		 `json:"registrationId"`
-	DocHash 		[]string	 `json:"docHash"`
+	FirstName   		string 		`json:"firstName"`
+	LastName    		string 		`json:"lastName"`
+	Gender      		string 		`json:"gender"`
+	Email       		string 		`json:"email"`
+	PhoneNumber 		string 		`json:"phoneNumber"`
+	Address     		string 		`json:"address"`
+	Key         		string 		`json:"registrationId"`
+	DocHash     		string 		`json:"docHash"`
+	AllowedBankerIds	[]string 	`json:"bankerId"`
 }
 
 // QueryResult structure used for handling result of query
@@ -49,7 +50,7 @@ func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 		err := ctx.GetStub().PutState("USER"+strconv.Itoa(i), userAsBytes)
 
 		if err != nil {
-			return fmt.Errorf("Failed to put to world state. %s", err.Error())
+			return fmt.Errorf("failed to put to world state. %s", err.Error())
 		}
 	}
 
@@ -57,18 +58,18 @@ func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 }
 
 // CreateUser adds a new user to the world state with given details
-func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNumber string, firstName string, lastName string, gender string, email string, phoneNumber string, address string) error {
-	docHash := []string{}
+func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNumber string, firstName string, lastName string, gender string, email string, phoneNumber string, address string, bankerId string) error {
+	docHash := ""
+	allowedBankerIds
 	user := User{
-		FirstName: 			firstName,
-		LastName: 			lastName,
-		Gender:  			gender,
-		Address: 			address,
-		PhoneNumber:     	phoneNumber,
-		Email:  			email,
-		DocHash: 			docHash,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Gender:      gender,
+		Address:     address,
+		PhoneNumber: phoneNumber,
+		Email:       email,
+		DocHash:     docHash,
 	}
-
 
 	userAsBytes, _ := json.Marshal(user)
 
@@ -80,7 +81,7 @@ func (s *KYCreg) QueryUser(ctx contractapi.TransactionContextInterface, userNumb
 	userAsBytes, err := ctx.GetStub().GetState(userNumber)
 
 	if err != nil {
-		return nil, fmt.Errorf("Failed to read from world state. %s", err.Error())
+		return nil, fmt.Errorf("failed to read from world state. %s", err.Error())
 	}
 
 	if userAsBytes == nil {
@@ -173,12 +174,16 @@ func (s *KYCreg) UpdateDocHash(ctx contractapi.TransactionContextInterface, user
 	if err != nil {
 		return err
 	}
+	//for
+	if user.DocHash == "" {
+		user.DocHash = newDocHash
 
-	user.DocHash = append(user.DocHash, newDocHash);
+		userAsBytes, _ := json.Marshal(user)
 
-	userAsBytes, _ := json.Marshal(user)
-
-	return ctx.GetStub().PutState(userNumber, userAsBytes)
+		return ctx.GetStub().PutState(userNumber, userAsBytes)
+	} else {
+		return fmt.Errorf("document already uploaded")
+	}
 }
 
 func (s *KYCreg) ChangeGender(ctx contractapi.TransactionContextInterface, userNumber string, newGender string) error {
