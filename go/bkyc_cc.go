@@ -60,7 +60,7 @@ func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 // CreateUser adds a new user to the world state with given details
 func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNumber string, firstName string, lastName string, gender string, email string, phoneNumber string, address string, bankerId string) error {
 	docHash := ""
-	allowedBankerIds
+	allowedBankerIds := []string{bankerId}
 	user := User{
 		FirstName:   firstName,
 		LastName:    lastName,
@@ -69,6 +69,7 @@ func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNum
 		PhoneNumber: phoneNumber,
 		Email:       email,
 		DocHash:     docHash,
+		AllowedBankerIds: allowedBankerIds,
 	}
 
 	userAsBytes, _ := json.Marshal(user)
@@ -148,6 +149,20 @@ func (s *KYCreg) ChangeUserFirstName(ctx contractapi.TransactionContextInterface
 	}
 
 	user.FirstName = newFirstName
+
+	userAsBytes, _ := json.Marshal(user)
+
+	return ctx.GetStub().PutState(userNumber, userAsBytes)
+}
+
+func (s *KYCreg) UpdateAllowedBankerIds(ctx contractapi.TransactionContextInterface, userNumber string, newBankerId string) error {
+	user, err := s.QueryUser(ctx, userNumber)
+
+	if err != nil {
+		return err
+	}
+
+	user.AllowedBankerIds = append(user.AllowedBankerIds, newBankerId)
 
 	userAsBytes, _ := json.Marshal(user)
 
