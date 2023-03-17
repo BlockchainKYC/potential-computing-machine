@@ -39,10 +39,7 @@ type QueryResult struct {
 // InitLedger adds a base set of users to the ledger
 func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	users := []User{
-		// User{Name: "Kavitha", Gender: "Female", Pan: "QWERT1234Y", Aadhar: "111122223333", Address: "Nit Warangal,506009"},
-		// User{Name: "Shyam", Gender: "Male", Pan: "ASDFG5678H", Aadhar: "222233334444", Address: "Nit Surathkal,511283"},
-		// User{Name: "Anand", Gender: "Male", Pan: "ZXCVB2345N", Aadhar: "333344445555", Address: "Nit Trichy,543213"},
-		// User{Name: "Nithya", Gender: "Female", Pan: "MNBVC9876X", Aadhar: "444455556666", Address: "Nit Bhopal,583214"},
+		User{FirstName: "Roxane", LastName: "Chase", Gender: "Female", Email: "roxanechase@gmail.com", PhoneNumber: "9876543210", Address: "Nit Warangal,506009", Key: "64072cbb5ac4a4f35e8c49ce",DocHash: "", AllowedBankerIds: []string{"appUser"}},
 	}
 
 	for i, user := range users {
@@ -125,6 +122,11 @@ func (s *KYCreg) QueryAllUsers(ctx contractapi.TransactionContextInterface) ([]Q
 
 	return results, nil
 }
+
+// TODO
+// func (s *KYCreg) CheckBankerAccessToKycID(ctx contractapi.TransactionContextInterface) ([]QueryResult, error) {
+	
+// }
 
 // ChangeUserAddress updates the address field of user with given id in world state
 func (s *KYCreg) ChangeUserAddress(ctx contractapi.TransactionContextInterface, userNumber string, newAddress string) error {
@@ -257,7 +259,7 @@ func (s *KYCreg) DeleteUser(ctx contractapi.TransactionContextInterface, userNum
 // 		return err
 // 	}
 
-// 	return userJSON != nil, nil
+// 	return userJSON != nil
 // }
 
 func main() {
