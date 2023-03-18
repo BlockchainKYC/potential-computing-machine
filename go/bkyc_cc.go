@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -27,7 +28,7 @@ type User struct {
 	Address     		string 		`json:"address"`
 	Key         		string 		`json:"registrationId"`
 	DocHash     		string 		`json:"docHash"`
-	AllowedBankerIds	[]string 	`json:"bankerId"`
+	AllowedBankerIds	string 	`json:"bankerId"`
 }
 
 // QueryResult structure used for handling result of query
@@ -39,7 +40,7 @@ type QueryResult struct {
 // InitLedger adds a base set of users to the ledger
 func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	users := []User{
-		User{FirstName: "Roxane", LastName: "Chase", Gender: "Female", Email: "roxanechase@gmail.com", PhoneNumber: "9876543210", Address: "Nit Warangal,506009", Key: "64072cbb5ac4a4f35e8c49ce",DocHash: "", AllowedBankerIds: []string{"appUser"}},
+		User{FirstName: "Roxane", LastName: "Chase", Gender: "Female", Email: "roxanechase@gmail.com", PhoneNumber: "9876543210", Address: "Nit Warangal,506009", Key: "64072cbb5ac4a4f35e8c49ce",DocHash: "", AllowedBankerIds: "appUser"},
 	}
 
 	for i, user := range users {
@@ -57,7 +58,7 @@ func (s *KYCreg) InitLedger(ctx contractapi.TransactionContextInterface) error {
 // CreateUser adds a new user to the world state with given details
 func (s *KYCreg) CreateUser(ctx contractapi.TransactionContextInterface, userNumber string, firstName string, lastName string, gender string, email string, phoneNumber string, address string, bankerId string) error {
 	docHash := ""
-	allowedBankerIds := []string{bankerId}
+	allowedBankerIds := bankerId
 	user := User{
 		FirstName:   firstName,
 		LastName:    lastName,
@@ -164,7 +165,8 @@ func (s *KYCreg) UpdateAllowedBankerIds(ctx contractapi.TransactionContextInterf
 		return err
 	}
 
-	user.AllowedBankerIds = append(user.AllowedBankerIds, newBankerId)
+	user.AllowedBankerIds += "," + newBankerId
+	fmt.Fprintln(os.Stdout, "AllowedBankerIds: ", user.AllowedBankerIds);
 
 	userAsBytes, _ := json.Marshal(user)
 
